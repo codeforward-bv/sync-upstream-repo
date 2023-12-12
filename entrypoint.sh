@@ -3,6 +3,7 @@
 set -x
 
 UPSTREAM_REPO=$1
+DOWNSTREAM_REPO=$GITHUB_REPOSITORY
 UPSTREAM_BRANCH=$2
 DOWNSTREAM_BRANCH=$3
 GITHUB_TOKEN=$4
@@ -22,27 +23,29 @@ if [[ -z "$DOWNSTREAM_BRANCH" ]]; then
   DOWNSTREAM_BREANCH=UPSTREAM_BRANCH
 fi
 
-if ! echo "$UPSTREAM_REPO" | grep '\.git'; then
-  UPSTREAM_REPO="https://github.com/${UPSTREAM_REPO_PATH}.git"
-fi
+UPSTREAM_REPO="https://x-access-token:${GITHUB_TOKEN}@github.com/${UPSTREAM_REPO}.git"
 
 echo "UPSTREAM_REPO=$UPSTREAM_REPO"
 
-git clone "https://github.com/${GITHUB_REPOSITORY}.git" work
+# Clone downstream repo
+git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/${DOWNSTREAM_REPO}.git" work
 cd work || { echo "Missing work dir" && exit 2 ; }
 
+# Configure Git user
 git config user.name "${GITHUB_ACTOR}"
 git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 git config --local user.password ${GITHUB_TOKEN}
 
-git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${DOWNSTREAM_REPO}.git"
 
+# Configure upstream
 git remote add upstream "$UPSTREAM_REPO"
 git fetch ${FETCH_ARGS} upstream
 git remote -v
 
 git checkout ${DOWNSTREAM_BRANCH}
 
+# Commit logs
 case ${SPAWN_LOGS} in
   (true)    echo -n "sync-upstream-repo https://github.com/dabreadman/sync-upstream-repo keeping CI alive."\
             "UNIX Time: " >> sync-upstream-repo

@@ -17,8 +17,8 @@ Example github action [here](https://github.com/THIS-IS-NOT-A-BACKUP/go-web-prox
 name: Sync Upstream
 
 env:
-  # Required, URL to upstream (fork base)
-  UPSTREAM_URL: "https://github.com/dabreadman/go-web-proxy.git"
+  # Required, upstream repo (fork base)
+  UPSTREAM_REPO: "dabreadman/go-web-proxy"
   # Required, token to authenticate bot, could use ${{ secrets.GITHUB_TOKEN }} 
   # Over here, we use a PAT instead to authenticate workflow file changes.
   WORKFLOW_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
@@ -49,7 +49,7 @@ jobs:
       - name: GitHub Sync to Upstream Repository
         uses: dabreadman/sync-upstream-repo@v1.3.0
         with: 
-          upstream_repo: ${{ env.UPSTREAM_URL }}
+          upstream_repo: ${{ env.UPSTREAM_REPO }}
           upstream_branch: ${{ env.UPSTREAM_BRANCH }}
           downstream_branch: ${{ env.DOWNSTREAM_BRANCH }}
           token: ${{ env.WORKFLOW_TOKEN }}
